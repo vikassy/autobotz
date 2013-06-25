@@ -87,7 +87,7 @@ bot = Cinch::Bot.new do
   end
 
   on :message,"!log" do |m|
-    msg = "#{m.user.nick}: The log can be found in http://ircbot-run123.rhcloud.com/message?channel=#{m.channel}&date=#{logger.get_time.day}"
+    msg = "#{m.user.nick}: The log can be found in http://ircbot-run123.rhcloud.com/message?channel=#{m.channel[1,m.channel.to_s.size-1]}&date=#{logger.get_time.day}"
     m.reply(msg)
     logger.bot_log(m.channel,msg)
   end
