@@ -2,5 +2,6 @@ require 'rubygems'
 require 'bundler'
 Bundler.require
 
-require './app.rb'
+require './irc_log.rb'
 run Sinatra::Application
+`ruby ./irc_bot.rb`
