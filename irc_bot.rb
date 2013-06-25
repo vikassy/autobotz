@@ -11,7 +11,8 @@ class Logger
 
   def initialize(ip,port) 
     # @redis = Redis.new(:host => ip, :port => port) #This is for development
-    @redis = Redis::new(:path=>"#{ENV['OPENSHIFT_GEAR_DIR']}tmp/redis.sock") #This is for production
+    @redis = Redis.new(:host => '127.4.45.1', :port => 15008)
+    # @redis = Redis::new(:path=>"#{ENV['OPENSHIFT_GEAR_DIR']}tmp/redis.sock") #This is for production
     len = redis.LLEN "channels"
     registered_channel = redis.lrange('channels',0,len)
     puts "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll"

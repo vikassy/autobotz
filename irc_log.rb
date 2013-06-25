@@ -3,8 +3,8 @@ require 'redis'
 require "erb"
 
 set :environment, :production #For ip:4567 , comment this to get localhost:4567
-# redis = Redis.new(:host => '127.0.0.1', :port => 6379) #This is for development
-redis = Redis::new(:path=>"#{ENV['OPENSHIFT_GEAR_DIR']}tmp/redis.sock") #This is for production
+redis = Redis.new(:host => '127.4.45.1', :port => 15008) #This is for development
+# redis = Redis::new(:path=>"#{ENV['OPENSHIFT_GEAR_DIR']}tmp/redis.sock") #This is for production
 
 get '/message' do
 	channel = "#"+params[:channel].to_s
