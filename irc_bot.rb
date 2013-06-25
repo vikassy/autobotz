@@ -10,13 +10,14 @@ class Logger
   attr_accessor :redis
 
   def initialize(ip,port) 
-    @redis = Redis.new(:host => ip, :port => port)
-      len = redis.LLEN "channels"
-      registered_channel = redis.lrange('channels',0,len)
-      puts "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll"
-      puts registered_channel
-      $channels_to_be_tracked.each do |f|
-        puts f
+    # @redis = Redis.new(:host => ip, :port => port) #This is for development
+    @redis = Redis::new(:path=>"#{ENV['OPENSHIFT_GEAR_DIR']}tmp/redis.sock") #This is for production
+    len = redis.LLEN "channels"
+    registered_channel = redis.lrange('channels',0,len)
+    puts "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll"
+    puts registered_channel
+    $channels_to_be_tracked.each do |f|
+      puts f
       if not registered_channel.include?(f)
         @redis.LPUSH "channels" , f
       end
