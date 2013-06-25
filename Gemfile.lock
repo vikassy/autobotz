@@ -1,9 +1,14 @@
 GEM
   remote: http://rubygems.org/
   specs:
+    cinch (2.0.4)
+    nokogiri (1.5.9)
     rack (1.5.2)
     rack-protection (1.5.0)
       rack
+    redis (3.0.4)
+    sanitize (2.0.3)
+      nokogiri (>= 1.4.4, < 1.6)
     sinatra (1.4.3)
       rack (~> 1.4)
       rack-protection (~> 1.4)
@@ -14,5 +19,8 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  cinch
   rack
+  redis
+  sanitize
   sinatra
