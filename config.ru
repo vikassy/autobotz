@@ -4,4 +4,4 @@ Bundler.require
 
 require './irc_log.rb'
 run Sinatra::Application
-`ruby ./irc_bot.rb`
+`ruby ./irc_bot.rb &`
