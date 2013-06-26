@@ -107,7 +107,10 @@ bot = Cinch::Bot.new do
 
 end
 
-bot.start
+job1 = fork do
+	bot.start
+end
+
 #================================================This is the code of the bot ===================================
 
 
