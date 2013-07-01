@@ -6,6 +6,7 @@ require 'sanitize'
 
 
 set :environment, :production #For ip:4567 , comment this to get localhost:4567
+#redis = Redis.new(:host => '127.0.0.1', :port => 6379)
 redis = Redis.new(:host => '127.4.45.1', :port => 15008) #This is for development
 # redis = Redis::new(:path=>"#{ENV['OPENSHIFT_GEAR_DIR']}tmp/redis.sock") #This is for production
 
@@ -19,12 +20,14 @@ class Logger
   attr_accessor :redis
 
   def initialize(ip,port) 
-    # @redis = Redis.new(:host => ip, :port => port) #This is for development
+    #@redis = Redis.new(:host => ip, :port => port) #This is for development
     @redis = Redis.new(:host => '127.4.45.1', :port => 15008)
     # @redis = Redis::new(:path=>"#{ENV['OPENSHIFT_GEAR_DIR']}tmp/redis.sock") #This is for production
     len = redis.LLEN "channels"
     registered_channel = redis.lrange('channels',0,len)
-    puts "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll"
+    puts "-----------------------------------------------"
+    puts "The registered channels are : "
+    puts "-----------------------------------------------"
     puts registered_channel
     $channels_to_be_tracked.each do |f|
       puts f
@@ -32,7 +35,9 @@ class Logger
         @redis.LPUSH "channels" , f
       end
     end
-    puts "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll"
+    puts "-----------------------------------------------"
+    puts "End of initialize"
+    puts "-----------------------------------------------"
   end
 
   def get_time
@@ -45,21 +50,26 @@ class Logger
   end
 
   def log(channel,user,msg)
-    puts "iiiiiiiinnnnnnnnnnnnnnnnnnnnnnnnnnnnnssssssssssssssssiiiiiiiiiiiiiddddddddddddddddeeeeeeeeeeeee"
-    puts "#{channel}:#{get_time.day}"
-    len =  @redis.LLEN "#{channel}:#{get_time.day}"
+    puts "-----------------------------------------------"
+    puts "Inside log....."
+    puts "#{channel}:#{get_time.strftime("%d-%m-%Y")}"
+    puts "-----------------------------------------------"
+    len =  @redis.LLEN "#{channel}:#{get_time.strftime("%d-%m-%Y")}"
     if len.to_i == 0
-      puts "iiiiiiiinnnnnnnnnnnnnnnnnnnnnnnnnnnnnssssssssssssssssiiiiiiiiiiiiiddddddddddddddddeeeeeeeeeeeee"
-      @redis.LPUSH "#{channel}" , "#{get_time.day}"
+      puts "-----------------------------------------------"
+      puts "Length of the list is zero"
+      puts "-----------------------------------------------"
+      @redis.LPUSH "#{channel}" , "#{get_time.strftime("%d-%m-%Y")}"
     end
-    puts "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll"
-    puts "#{channel}:#{get_time.day}"
+    puts "-----------------------------------------------"
+    puts "#{channel}:#{get_time.strftime("%d-%m-%Y")}"
+    puts "-----------------------------------------------"
     nick = Sanitize.clean(user.nick)
-    @redis.LPUSH "#{channel}:#{get_time.day}", "<div style='color: green;display: inline'><#{get_log_time}></div>"+"<div style='color: red;display: inline'>#{nick}</div>"+": "+Sanitize.clean(msg)
+    @redis.LPUSH "#{channel}:#{get_time.strftime("%d-%m-%Y")}", "<div style='color: green;display: inline'><#{get_log_time}></div>"+"<div style='color: red;display: inline'>#{nick}</div>"+": "+Sanitize.clean(msg)
   end
 
   def bot_log(channel,msg)    
-    @redis.LPUSH "#{channel}:#{get_time.day}", "<div style='color: green;display: inline'><#{get_log_time}></div>"+"<div style='color: red;display: inline'>autobotz</div>"+": "+msg
+    @redis.LPUSH "#{channel}:#{get_time.strftime("%d-%m-%Y")}", "<div style='color: green;display: inline'><#{get_log_time}></div>"+"<div style='color: red;display: inline'>autobotz</div>"+": "+msg
   end
 
 end
@@ -96,7 +106,7 @@ bot = Cinch::Bot.new do
   end
 
   on :message,"!log" do |m|
-    msg = "#{m.user.nick}: The log can be found in http://ircbot-run123.rhcloud.com/message?channel=#{(m.channel.to_s)[1,m.channel.to_s.size-1]}&date=#{logger.get_time.day}"
+    msg = "#{m.user.nick}: The log can be found in http://ircbot-run123.rhcloud.com/message?channel=#{(m.channel.to_s)[1,m.channel.to_s.size-1]}&date=#{logger.get_time.strftime("%d-%m-%Y")}"
     m.reply(msg)
     logger.bot_log(m.channel,msg)
   end
@@ -134,12 +144,15 @@ end
 get '/:channel' do
 	channel = params[:channel].to_s
 	len = redis.LLEN "\##{channel}"
-	puts "Here =============================================== #{len}"
+  puts "-----------------------------------------------"
+	puts "In the /:channel get"
+  puts "-----------------------------------------------"
 	@data=" "
 	c = redis.lrange("\##{channel}",0,len).each do |f|
-		puts "inside"
+    puts f.to_s
 		@data+="<a href=\" /message?channel=#{channel}&date=#{f}\">#{f}</a><br /><br />"
 	end
+  puts "-----------------------------------------------"
 	erb :index
 end
 
